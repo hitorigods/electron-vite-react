@@ -1,6 +1,6 @@
 {
-	"name": "electron-vite-react",
-	"version": "2.2.0",
+	"name": "MyApp",
+	"version": "1.0.0",
 	"main": "dist-electron/main/index.js",
 	"description": "Electron Vite React boilerplate.",
 	"author": "Hiroyuki Ohta",
