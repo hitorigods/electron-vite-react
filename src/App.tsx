@@ -1,13 +1,20 @@
+import { ipcRenderer } from 'electron';
 import { useState } from 'react';
 import Update from '@/components/update';
 import logoVite from './assets/logo-vite.svg';
 import logoElectron from './assets/logo-electron.svg';
 import './App.scss';
 
-console.log('[App.tsx]', `Hello world from Electron ${process.versions.electron}!`);
+console.log('[App.tsx]', `Electron ${process.versions.electron}!`);
 
 function App() {
 	const [count, setCount] = useState(0);
+	const clickHandler = () => {
+		const countNext = count + 1;
+		setCount((count) => countNext);
+		ipcRenderer.send('app-click-count', countNext);
+	};
+
 	return (
 		<div className="App">
 			<div className="logo-box">
@@ -18,7 +25,7 @@ function App() {
 			</div>
 			<h1>Electron + Vite + React</h1>
 			<div className="card">
-				<button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
+				<button onClick={clickHandler}>count is {count}</button>
 				<p>日本語が入ります。</p>
 				<p>
 					Edit <code>src/App.tsx</code> and save to test HMR
