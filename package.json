@@ -12,7 +12,7 @@
 		}
 	},
 	"scripts": {
-		"dev": "vite",
+		"dev": "chcp 65001 && vite",
 		"build": "tsc && vite build && electron-builder",
 		"preview": "vite preview",
 		"pree2e": "vite build --mode=test",
@@ -20,9 +20,11 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/noto-sans-jp": "^5.0.7",
-		"@types/react-helmet": "^6.1.6",
+		"@types/react-helmet-async": "^1.0.3",
 		"electron-updater": "^6.1.1",
-		"react-helmet": "^6.1.0"
+		"i": "^0.3.7",
+		"npm": "^9.8.1",
+		"react-helmet-async": "^1.3.0"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.37.1",

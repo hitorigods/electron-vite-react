@@ -17,7 +17,7 @@ npm run dev
 │   ├── main                                 メインプロセス
 │   └── preload                              Preload
 │
-├── release                                  ブルドデータ
+├── release                                  ビルドデータ
 │   └── {version}
 │       ├── {os}-{os_arch}                   実行可能ファイル
 │       └── {app_name}_{version}.{ext}       アプリケーションのインストーラー
