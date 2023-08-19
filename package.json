@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "dist-electron/main/index.js",
 	"description": "Electron Vite React boilerplate.",
-	"author": "Hiroyuki Ohta",
+	"author": "Hitorigods",
 	"license": "MIT",
 	"private": true,
 	"debug": {
@@ -20,7 +20,9 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/noto-sans-jp": "^5.0.7",
-		"electron-updater": "^6.1.1"
+		"@types/react-helmet": "^6.1.6",
+		"electron-updater": "^6.1.1",
+		"react-helmet": "^6.1.0"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.37.1",

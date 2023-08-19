@@ -23,7 +23,7 @@ function App() {
 					<img src={logoElectron} className="logo electron" alt="Electron + Vite logo" />
 				</a>
 			</div>
-			<h1>Electron + Vite + React</h1>
+			<h1>Electron + Vite + React + Sass</h1>
 			<div className="card">
 				<button onClick={clickHandler}>count is {count}</button>
 				<p>日本語が入ります。</p>

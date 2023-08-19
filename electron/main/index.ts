@@ -37,16 +37,18 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let window: BrowserWindow | null = null;
+const url = process.env.VITE_DEV_SERVER_URL;
+const devToolsWidth = 570;
+const indexHtml = join(process.env.DIST, 'index.html');
+
 // プリロード画面
 const preload = join(__dirname, '../preload/index.js');
-const url = process.env.VITE_DEV_SERVER_URL;
-const indexHtml = join(process.env.DIST, 'index.html');
 
 async function createWindow() {
 	window = new BrowserWindow({
 		title: 'Main window',
 		icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
-		width: url ? 800 + 480 : 800,
+		width: url ? 800 + devToolsWidth : 800,
 		height: 600,
 		webPreferences: {
 			preload,
