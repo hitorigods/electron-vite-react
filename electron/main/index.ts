@@ -4,6 +4,8 @@ import { release } from 'node:os';
 import { join } from 'node:path';
 import { update } from './update';
 
+console.log('日本語');
+
 // ビルド後のディレクトリ構造
 //
 // ├─┬ dist-electron
@@ -87,7 +89,6 @@ const LoadWindowSize = () => {
 const createWindow = async () => {
 	// サイズ情報を読み込む
 	const windowSize = LoadWindowSize();
-	console.log('windowSize', windowSize);
 
 	window = new BrowserWindow(windowSettings);
 
