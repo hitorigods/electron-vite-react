@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { release } from 'node:os';
 import { join } from 'node:path';
+import menuHandler from './menu';
 import processEnv from './process.env';
 import { windowSaveConfig, windowSaveHandler } from './window.save';
 import { update } from './update';
@@ -50,6 +51,9 @@ windowSaveConfig.webPreferences = {
 	nodeIntegration: true,
 	contextIsolation: false,
 };
+
+// メニューを適用
+menuHandler();
 
 const createWindow = async () => {
 	window = new BrowserWindow(windowSaveConfig);
