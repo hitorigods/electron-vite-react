@@ -48,7 +48,9 @@ const preload = join(__dirname, '../preload/index.js');
 const devToolsWidth = 570;
 
 // ウィンドウのサイズを保存するファイル名
-const windowSizeFile = join(process.env.VITE_PUBLIC, './window-settings.json');
+const windowSizeFile = url
+	? join(process.env.VITE_PUBLIC, './window-settings.json')
+	: join(process.resourcesPath, './app/window-settings.json');
 
 // ウィンドウのデフォルトのサイズ設定
 const windowSettings = {
@@ -70,13 +72,10 @@ const windowSettings = {
 
 // jsonファイルを読み込み結果を返す
 const LoadWindowSize = () => {
-	console.log('windowSizeFile', windowSizeFile);
-
 	if (!fs.existsSync(windowSizeFile)) {
 		return {};
 	}
 	const fileContent = fs.readFileSync(windowSizeFile, 'utf-8');
-	console.log('fileContent', fileContent);
 
 	try {
 		return JSON.parse(fileContent);
@@ -100,8 +99,6 @@ const createWindow = async () => {
 
 	// アプリ終了時に画面情報を保存するよう設定
 	window.on('close', () => {
-		console.log('close');
-
 		const sizes = window ? window.getSize() : [1280, 800];
 		const positions = window ? window.getPosition() : [0, 0];
 		const fileContents = {
@@ -110,7 +107,6 @@ const createWindow = async () => {
 			width: sizes[0],
 			height: sizes[1],
 		};
-		console.log('fileContents', fileContents);
 
 		fs.writeFile(windowSizeFile, JSON.stringify(fileContents), (error) => {
 			if (error) {
