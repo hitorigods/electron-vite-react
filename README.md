@@ -1,6 +1,6 @@
-# electron-vite-react
+# Electron + Vite + React + Sass
 
-## Quick Setup
+## セットアップ
 
 ```sh
 # モジュールをインストール
