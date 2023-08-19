@@ -38,7 +38,8 @@ if (!app.requestSingleInstanceLock()) {
 
 let window: BrowserWindow | null = null;
 
-const url = __ENV__.VITE_DEV_SERVER_URL;
+const devURL = __ENV__.VITE_DEV_SERVER_URL;
+const isDev = !!devURL;
 const indexHtml = join(__ENV__.DIST, 'index.html');
 
 // プリロード画面
@@ -60,8 +61,8 @@ const createWindow = async () => {
 
 	windowSaveHandler(window);
 
-	if (url) {
-		window.loadURL(url);
+	if (isDev) {
+		window.loadURL(devURL);
 		window.webContents.openDevTools();
 	} else {
 		window.loadFile(indexHtml);
@@ -116,8 +117,8 @@ ipcMain.handle('open-win', (_, arg) => {
 		},
 	});
 
-	if (__ENV__.VITE_DEV_SERVER_URL) {
-		childWindow.loadURL(`${url}#${arg}`);
+	if (isDev) {
+		childWindow.loadURL(`${devURL}#${arg}`);
 	} else {
 		childWindow.loadFile(indexHtml, { hash: arg });
 	}
