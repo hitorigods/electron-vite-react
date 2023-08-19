@@ -1,4 +1,5 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import fs from 'fs';
 import { release } from 'node:os';
 import { join } from 'node:path';
 import { update } from './update';
@@ -37,27 +38,87 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let window: BrowserWindow | null = null;
+
 const url = process.env.VITE_DEV_SERVER_URL;
-const devToolsWidth = 570;
 const indexHtml = join(process.env.DIST, 'index.html');
 
 // プリロード画面
 const preload = join(__dirname, '../preload/index.js');
 
-async function createWindow() {
-	window = new BrowserWindow({
-		title: 'Main window',
-		icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
-		width: url ? 800 + devToolsWidth : 800,
-		height: 600,
-		webPreferences: {
-			preload,
-			// 警告: production環境では、nodeIntegration を有効にし、contextIsolation を無効に設定
-			// contextBridge.exposeInMainWorld の使用を検討してください
-			// 詳細：https://www.electronjs.org/docs/latest/tutorial/context-isolation
-			nodeIntegration: true,
-			contextIsolation: false,
-		},
+const devToolsWidth = 570;
+
+// ウィンドウのサイズを保存するファイル名
+const windowSizeFile = join(process.env.VITE_PUBLIC, './window-settings.json');
+
+// ウィンドウのデフォルトのサイズ設定
+const windowSettings = {
+	title: 'Main window',
+	icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+	webPreferences: {
+		preload,
+		// 警告: production環境では、nodeIntegration を有効にし、contextIsolation を無効に設定
+		// contextBridge.exposeInMainWorld の使用を検討してください
+		// 詳細：https://www.electronjs.org/docs/latest/tutorial/context-isolation
+		nodeIntegration: true,
+		contextIsolation: false,
+	},
+	x: 0,
+	y: 0,
+	width: url ? 1280 + devToolsWidth : 1280,
+	height: 800,
+};
+
+// jsonファイルを読み込み結果を返す
+const LoadWindowSize = () => {
+	console.log('windowSizeFile', windowSizeFile);
+
+	if (!fs.existsSync(windowSizeFile)) {
+		return {};
+	}
+	const fileContent = fs.readFileSync(windowSizeFile, 'utf-8');
+	console.log('fileContent', fileContent);
+
+	try {
+		return JSON.parse(fileContent);
+	} catch (error) {
+		return {};
+	}
+};
+
+const createWindow = async () => {
+	// サイズ情報を読み込む
+	const windowSize = LoadWindowSize();
+	console.log('windowSize', windowSize);
+
+	window = new BrowserWindow(windowSettings);
+
+	// サイズ情報があれば、設定する
+	if (Object.entries(windowSize).length != 0) {
+		window.setPosition(windowSize.x, windowSize.y);
+		window.setSize(windowSize.width, windowSize.height);
+	}
+
+	// アプリ終了時に画面情報を保存するよう設定
+	window.on('close', () => {
+		console.log('close');
+
+		const sizes = window ? window.getSize() : [1280, 800];
+		const positions = window ? window.getPosition() : [0, 0];
+		const fileContents = {
+			x: positions[0],
+			y: positions[1],
+			width: sizes[0],
+			height: sizes[1],
+		};
+		console.log('fileContents', fileContents);
+
+		fs.writeFile(windowSizeFile, JSON.stringify(fileContents), (error) => {
+			if (error) {
+				console.log('error', error);
+			} else {
+				console.log('ファイルが正常に書き出しされました');
+			}
+		});
 	});
 
 	if (url) {
@@ -80,7 +141,7 @@ async function createWindow() {
 
 	// electron-updaterを適用
 	update(window);
-}
+};
 
 app.whenReady().then(createWindow);
 
@@ -91,7 +152,7 @@ app.on('window-all-closed', () => {
 
 app.on('second-instance', () => {
 	if (window) {
-		// ユーザーが別のウィンドウを開こうとした場合、メイン ウィンドウにフォーカス
+		// ユーザーが別のウィンドウを開こうとした場合、メインウィンドウにフォーカス
 		if (window.isMinimized()) window.restore();
 		window.focus();
 	}
