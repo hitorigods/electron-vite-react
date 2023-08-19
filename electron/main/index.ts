@@ -1,5 +1,4 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import fs from 'fs';
 import { release } from 'node:os';
 import { join } from 'node:path';
 import processEnv from './process.env';
@@ -18,7 +17,7 @@ import { update } from './update';
 //
 
 // process.envの格納
-processEnv();
+const __ENV__ = processEnv();
 
 // Windows 7 の GPU アクセラレーションを無効
 if (release().startsWith('6.1')) app.disableHardwareAcceleration();
@@ -38,8 +37,8 @@ if (!app.requestSingleInstanceLock()) {
 
 let window: BrowserWindow | null = null;
 
-const url = process.env.VITE_DEV_SERVER_URL;
-const indexHtml = join(process.env.DIST, 'index.html');
+const url = __ENV__.VITE_DEV_SERVER_URL;
+const indexHtml = join(__ENV__.DIST, 'index.html');
 
 // プリロード画面
 const preload = join(__dirname, '../preload/index.js');
@@ -113,7 +112,7 @@ ipcMain.handle('open-win', (_, arg) => {
 		},
 	});
 
-	if (process.env.VITE_DEV_SERVER_URL) {
+	if (__ENV__.VITE_DEV_SERVER_URL) {
 		childWindow.loadURL(`${url}#${arg}`);
 	} else {
 		childWindow.loadFile(indexHtml, { hash: arg });
