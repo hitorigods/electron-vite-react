@@ -1,6 +1,6 @@
 # electron-vite-react
 
-## 🛫 Quick Setup
+## Quick Setup
 
 ```sh
 # モジュールをインストール
@@ -26,7 +26,7 @@ npm run dev
 └── src                                      レンダラー、Reactアプリケーション
 ```
 
-## 🔧 追加機能
+## 追加機能
 
 1. electron-updater [see docs](src/components/update/README.md)
 1. playwright
