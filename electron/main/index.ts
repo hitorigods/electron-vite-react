@@ -2,9 +2,9 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import fs from 'fs';
 import { release } from 'node:os';
 import { join } from 'node:path';
+import processEnv from './process.env';
+import { windowSaveConfig, windowSaveHandler } from './window.save';
 import { update } from './update';
-
-console.log('日本語');
 
 // ビルド後のディレクトリ構造
 //
@@ -16,12 +16,9 @@ console.log('日本語');
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
-process.env.DIST_ELECTRON = join(__dirname, '../');
-process.env.DIST = join(process.env.DIST_ELECTRON, '../dist');
 
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-	? join(process.env.DIST_ELECTRON, '../public')
-	: process.env.DIST;
+// process.envの格納
+processEnv();
 
 // Windows 7 の GPU アクセラレーションを無効
 if (release().startsWith('6.1')) app.disableHardwareAcceleration();
@@ -46,77 +43,19 @@ const indexHtml = join(process.env.DIST, 'index.html');
 
 // プリロード画面
 const preload = join(__dirname, '../preload/index.js');
-
-const devToolsWidth = 570;
-
-// ウィンドウのサイズを保存するファイル名
-const windowSizeFile = url
-	? join(process.env.VITE_PUBLIC, './window-settings.json')
-	: join(process.resourcesPath, './app/window-settings.json');
-
-// ウィンドウのデフォルトのサイズ設定
-const windowSettings = {
-	title: 'Main window',
-	icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
-	webPreferences: {
-		preload,
-		// 警告: production環境では、nodeIntegration を有効にし、contextIsolation を無効に設定
-		// contextBridge.exposeInMainWorld の使用を検討してください
-		// 詳細：https://www.electronjs.org/docs/latest/tutorial/context-isolation
-		nodeIntegration: true,
-		contextIsolation: false,
-	},
-	x: 0,
-	y: 0,
-	width: url ? 1280 + devToolsWidth : 1280,
-	height: 800,
-};
-
-// jsonファイルを読み込み結果を返す
-const LoadWindowSize = () => {
-	if (!fs.existsSync(windowSizeFile)) {
-		return {};
-	}
-	const fileContent = fs.readFileSync(windowSizeFile, 'utf-8');
-
-	try {
-		return JSON.parse(fileContent);
-	} catch (error) {
-		return {};
-	}
+windowSaveConfig.webPreferences = {
+	preload,
+	// 警告: production環境では、nodeIntegration を有効にし、contextIsolation を無効に設定
+	// contextBridge.exposeInMainWorld の使用を検討してください
+	// 詳細：https://www.electronjs.org/docs/latest/tutorial/context-isolation
+	nodeIntegration: true,
+	contextIsolation: false,
 };
 
 const createWindow = async () => {
-	// サイズ情報を読み込む
-	const windowSize = LoadWindowSize();
+	window = new BrowserWindow(windowSaveConfig);
 
-	window = new BrowserWindow(windowSettings);
-
-	// サイズ情報があれば、設定する
-	if (Object.entries(windowSize).length != 0) {
-		window.setPosition(windowSize.x, windowSize.y);
-		window.setSize(windowSize.width, windowSize.height);
-	}
-
-	// アプリ終了時に画面情報を保存するよう設定
-	window.on('close', () => {
-		const sizes = window ? window.getSize() : [1280, 800];
-		const positions = window ? window.getPosition() : [0, 0];
-		const fileContents = {
-			x: positions[0],
-			y: positions[1],
-			width: sizes[0],
-			height: sizes[1],
-		};
-
-		fs.writeFile(windowSizeFile, JSON.stringify(fileContents), (error) => {
-			if (error) {
-				console.log('error', error);
-			} else {
-				console.log('ファイルが正常に書き出しされました');
-			}
-		});
-	});
+	windowSaveHandler(window);
 
 	if (url) {
 		window.loadURL(url);
